@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+
+  db:
+    image: postgres
+    container_name: db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: db_book
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+
+  backend:
+    image: backend:v1
+    container_name: backend_container
+    build:
+      context: ./backend
+    ports:
+      - "8989:8989"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      SPRING_DATASOURCE_URL : jdbc:postgresql://db:5432/db_book
+      SPRING_DATASOURCE_USERNAME : admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      
+  frontend:
+    image: frontend:v2
+    container_name: frontend_container
+    build:
+      context: ./frontend
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
